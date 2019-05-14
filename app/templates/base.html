@@ -1,0 +1,73 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}
+    Nameless Mangas
+{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="icon" type="imagem/png" href="img/bleach.jpg" />
+{% endblock %}
+
+
+{% block navbar %}
+    <div class="navbar navbar-inverse " role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="/" class="navbar-brand">Home</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-left">
+                    <li>
+                        <a onclick="mostrarPagina()" href="#" role="button" class="btn btn-info">Home</a>
+                    </li>
+                    <li>
+                        <a onclick="mostrarPagina('mangas.html')" href="#" role="button" class="btn btn-info">Mangas</a>                    
+                    </li>
+                    <li>
+                        <a onclick="mostrarPagina('about.html')" href="#" role="button" class="btn btn-info">About</a>                    
+                    </li>                    
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if current_user.is_authenticated %}
+                        <li>
+                            <a href="{{ url_for('auth.roleRegister') }}">
+                                Role Register
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for("auth.logout") }}">
+                                Log out
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="#modalLogin" role="button" class="btn btn-primary" data-toggle="modal">Login</a>
+                        </li>
+                        <li>
+                            <a onclick="mostrarPagina('cadastro.html')" role="button" class="btn btn-outline-success">Register</a>  
+                        </li>
+                  
+                        <li>
+                            <a href="{{ url_for("auth.login") }}">
+                                Log in
+                            </a>
+                        </li>
+                    {% endif %}                    
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% block page_content %}{% endblock %}
+    </div>
+{% endblock %}

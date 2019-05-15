@@ -1,7 +1,9 @@
-from flask import session, redirect, url_for, flash, render_template
+from flask import session, redirect, url_for, flash, render_template, jsonify
 from flask_login import login_required
 from . import main
 from .forms import NameForm
+from app.models import User, Role, Manga
+
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
@@ -19,3 +21,8 @@ def index():
 @login_required
 def user(name):
     return render_template('user.html', name=name) 
+
+@main.route('/mangas')
+def mangas():
+    mangas = Manga.query.all()
+    return jsonify({'mangas': mangas})

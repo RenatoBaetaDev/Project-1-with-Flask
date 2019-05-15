@@ -38,3 +38,26 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+    
+
+class Manga(db.Model):
+    __tablename__ = 'mangas'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(64))
+    synopsis = db.Column(db.String(64))
+    chapters = db.relationship('Chapter', backref='manga')
+    release_date = db.Column(db.DateTime())
+    conclusion_date = db.Column(db.DateTime())
+
+    def __repr__(self):
+        return '<Manga %r>' % self.title    
+
+class Chapter(db.Model):
+    __tablename__ = 'chapters'
+    id = db.Column(db.Integer, primary_key=True)
+    manga_id = db.Column(db.Integer, db.ForeignKey('mangas.id'))
+    number = db.Column(db.Integer)    
+    release_date = db.Column(db.DateTime())
+
+    def __repr__(self):
+        return '<Chapter %r>' % self.number     

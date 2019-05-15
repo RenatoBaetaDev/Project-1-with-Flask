@@ -1,0 +1,71 @@
+.imagem-carrosel{
+    width: 1200px;
+    height: 400px !important;
+}
+
+body {
+    background-image: url(../img/bleach.jpg);
+    color: white;
+}
+
+.carousel-caption {
+    border-radius: 5%;
+    background-color: black;
+    opacity: 0.7;
+}
+
+#cadastro , #login {
+    border: 2px solid black;
+    border-radius: 5%;
+    background-color: black;
+    opacity: 0.9;
+}
+
+.carousel-caption > h4 > a:hover{
+    color: white;
+}
+
+#listaMangas {
+    padding: 10px;
+}
+
+#listaMangas fieldset {
+    border: 0px;
+}
+
+.fa {
+    padding: 5px;
+    font-size: 10px;
+    width: 40px;
+    text-align: center;
+    text-decoration: none;
+    margin: 5px 2px;
+  }
+
+
+.fa-facebook {
+  background: #3B5998;
+  color: white;
+}
+
+.fa-twitter {
+  background: #55ACEE;
+  color: white;
+}
+
+.fa-instagram {
+    background: #125688;
+    color: white;
+}
+
+.mangas-chapter {
+    width: 100%;
+}
+
+/* .mangas-chapter > tbody tr td {
+    width: 100%;
+} */
+
+#page-footer {
+    background-color: black;
+}

@@ -3,11 +3,6 @@
     height: 400px !important;
 }
 
-body {
-    background-image: url(../img/bleach.jpg);
-    color: white;
-}
-
 .carousel-caption {
     border-radius: 5%;
     background-color: black;
@@ -68,4 +63,8 @@ body {
 
 #page-footer {
     background-color: black;
+    color: white;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }

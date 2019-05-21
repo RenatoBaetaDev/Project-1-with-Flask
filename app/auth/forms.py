@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, ValidationError
 from wtforms.validators import DataRequired, EqualTo, Length
+from wtforms.fields.html5 import EmailField
 
 from app.models import User, Role
 
@@ -15,19 +16,22 @@ class RoleRegistrationForm(FlaskForm):
             raise ValidationError('Role already registered.')
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Usuário', validators=[
+    username = StringField('Nickname', validators=[
         DataRequired(), Length(1, 64)
     ])
-    password = PasswordField('Senha', validators=[
+    email = EmailField('Email Address', validators=[
         DataRequired()
     ])
-    password2 = PasswordField('Confirmar Senha', validators=[
+    password = PasswordField('Password', validators=[
+        DataRequired()
+    ])
+    password2 = PasswordField('Confirm Password', validators=[
         DataRequired(), EqualTo('password', message='Senhas não conferem.')
     ])
     submit = SubmitField('Registrar')
 
-    def validate_username(self, field):
-        if User.query.filter_by(username=field.data).first():
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
             raise ValidationError("Usuário já registrado.")
 
 

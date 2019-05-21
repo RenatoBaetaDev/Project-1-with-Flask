@@ -46,6 +46,7 @@ class Manga(db.Model):
     title = db.Column(db.String(64))
     synopsis = db.Column(db.String(64))
     chapters = db.relationship('Chapter', backref='manga')
+    imagem = db.Column(db.String(128))
     release_date = db.Column(db.DateTime())
     conclusion_date = db.Column(db.DateTime())
 

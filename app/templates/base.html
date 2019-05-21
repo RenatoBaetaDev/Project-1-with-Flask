@@ -52,7 +52,7 @@
                             <a href="#modalLogin" role="button"  data-toggle="modal">Login</a>
                         </li>
                         <li>
-                            <a onclick="mostrarPagina('cadastro.html')" role="button" >Register</a>  
+                            <a onclick="mostrarPagina('{{ url_for('auth.register') }}')" role="button" >Register</a>  
                         </li>
                   
                         <li>
@@ -68,7 +68,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
+    <div id="conteudo" class="container">
         {% block page_content %}{% endblock %}
     </div>
 
@@ -89,7 +89,7 @@
 				E-mail: namelessMangas@email.com
 
 				<div class="footer-copyright text-center py-3">&copy; 2019 Copyright:
-						<a onclick="mostrarPagina('about.html')"  href="#"> Nameless Mangás</a>
+					<a onclick="mostrarPagina('about.html')"  href="#"> Nameless Mangás</a>
 				</div>
 			</div>
 			<div class="col-md-4">
@@ -105,12 +105,29 @@
 						<a href="#" class="fa fa-instagram"></a>
 					</li>
 				</ul>
-
-
 			</div>
 		</div>
     </div>    
     
-    
+{% endblock %}
 
+{% block scripts %}
+    {{ super() }}
+        
+    <script>
+        $(document).ready( function () {
+            //mostrarPagina();
+        });
+        function mostrarPagina(pagina="/index", elemento = "") {
+            $.get( pagina, function( data ) {
+                $( "#conteudo" ).html( data );
+            });
+            // $(".container").html("");
+            // $(".container").load(pagina, function() {
+            //     if (elemento){
+            //         $('#'+elemento).toggle();
+            //     }
+            // });
+        }    
+    </script>    
 {% endblock %}

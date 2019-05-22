@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from flask_login import LoginManager
 
+
 bootstrap = Bootstrap()
 db = SQLAlchemy()
 config = Config()
@@ -13,6 +14,7 @@ login_manager.login_view = 'auth.login'
 def create_app():
     app = Flask(__name__)
     app.config.from_object(config)
+
     config.init_app(app)
 
     bootstrap.init_app(app)
@@ -24,5 +26,9 @@ def create_app():
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
+
+    from .manga import manga as manga_blueprint
+    app.register_blueprint(manga_blueprint)    
+
 
     return app

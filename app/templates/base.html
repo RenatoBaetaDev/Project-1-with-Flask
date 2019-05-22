@@ -22,24 +22,24 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a onclick="mostrarPagina()" href="#" role="button" class="navbar-brand">Home</a>
+                <a href="{{ url_for('main.index') }}" role="button" class="navbar-brand">Home</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-left">
                     <li>
                     </li>
                     <li>
-                        <a onclick="mostrarPagina('mangas.html')" href="#" role="button">Mangas</a>                    
+                        <a href="{{ url_for('manga.list') }}" role="button">Mangas</a>                    
                     </li>
                     <li>
-                        <a onclick="mostrarPagina('about.html')" href="#" role="button">About</a>                    
+                        <a href="{{ url_for('main.about') }}" href="#" role="button">About</a>                    
                     </li>                    
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_authenticated %}
                         <li>
-                            <a href="{{ url_for('auth.roleRegister') }}">
-                                Role Register
+                            <a href="{{ url_for('manga.register') }}">
+                                Mangas Register
                             </a>
                         </li>
                         <li>
@@ -49,10 +49,7 @@
                         </li>
                     {% else %}
                         <li>
-                            <a href="#modalLogin" role="button"  data-toggle="modal">Login</a>
-                        </li>
-                        <li>
-                            <a onclick="mostrarPagina('{{ url_for('auth.register') }}')" role="button" >Register</a>  
+                            <a href="{{ url_for('auth.register') }}" role="button" >Register</a>  
                         </li>
                   
                         <li>
@@ -68,8 +65,14 @@
 {% endblock %}
 
 {% block content %}
-    <div id="conteudo" class="container">
-        {% block page_content %}{% endblock %}
+    <div id="body" class="container">
+        {% block page_content %}
+            {% for message in get_flashed_messages() %}
+            <div class="alert alert-warning">
+                {{ message }}
+            </div>
+            {% endfor %}        
+        {% endblock %}
     </div>
 
 
@@ -89,7 +92,7 @@
 				E-mail: namelessMangas@email.com
 
 				<div class="footer-copyright text-center py-3">&copy; 2019 Copyright:
-					<a onclick="mostrarPagina('about.html')"  href="#"> Nameless Mangás</a>
+					<a onclick="{{ url_for('main.about') }}"  href="#"> Nameless Mangás</a>
 				</div>
 			</div>
 			<div class="col-md-4">
@@ -111,23 +114,3 @@
     
 {% endblock %}
 
-{% block scripts %}
-    {{ super() }}
-        
-    <script>
-        $(document).ready( function () {
-            //mostrarPagina();
-        });
-        function mostrarPagina(pagina="/index", elemento = "") {
-            $.get( pagina, function( data ) {
-                $( "#conteudo" ).html( data );
-            });
-            // $(".container").html("");
-            // $(".container").load(pagina, function() {
-            //     if (elemento){
-            //         $('#'+elemento).toggle();
-            //     }
-            // });
-        }    
-    </script>    
-{% endblock %}

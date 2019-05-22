@@ -2,11 +2,6 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block page_content %}
-    {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning">
-            {{ message }}
-        </div>
-    {% endfor %}
 
     <div class="row">
         <div class="col-md-3"></div>

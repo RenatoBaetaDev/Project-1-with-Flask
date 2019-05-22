@@ -26,18 +26,18 @@ class RegistrationForm(FlaskForm):
         DataRequired()
     ])
     password2 = PasswordField('Confirm Password', validators=[
-        DataRequired(), EqualTo('password', message='Senhas não conferem.')
+        DataRequired(), EqualTo('password', message='Passwords must match.')
     ])
-    submit = SubmitField('Registrar')
+    submit = SubmitField('Register')
 
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
-            raise ValidationError("Usuário já registrado.")
+            raise ValidationError("Email já registrado.")
 
 
 
 class LoginForm(FlaskForm):
-    username = StringField('User', validators=[
+    email = EmailField('Email Address', validators=[
         DataRequired()
     ])
     password = PasswordField('Password', validators=[

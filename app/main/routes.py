@@ -22,7 +22,11 @@ def index():
 def user(name):
     return render_template('user.html', name=name) 
 
-@main.route('/mangas')
-def mangas():
-    mangas = Manga.query.all()
-    return jsonify({'mangas': mangas})
+# @main.route('/mangas')
+# def mangas():
+#     mangas = Manga.query.all()
+#     return jsonify({'mangas': mangas})
+
+@main.route('/about')
+def about():
+    return render_template('about.html')

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+    <div class="text-center">
+        <img class="mangas-chapter-image" alt="{{manga.title}}" src="{{manga.image}}">
+    </div>        
+
+    <fieldset class="rounded  bg-dark ">
+        <legend class="w-auto" align="center">
+            <h1> 
+                <button class="badge badge-primary" type="button" data-toggle="collapse" data-target="#{{manga.id}}" aria-expanded="false" aria-controls="{{manga.id}}">
+                    {{manga.title}}
+                </button>
+            </h1>
+        </legend>
+
+
+        <div class="collapse" id="{{manga.id}}">                 
+
+            <table class="table mangas-chapter text-light text-center ">
+                <thead>
+                    <td>Number</td>
+                    <td>Title</td>
+                    <td>Date</td>
+                </thead>
+
+                {% for chapter in chapters %}
+                    <tbody>
+                        <tr>
+                            <td class="">
+                                <a href="#">chapter.number</a>    
+                            </td>
+                            <td class="">chapter.title</td>
+                            <td class="">chapter.release_date.strftime('%m/%d/%Y')</td>
+                            <td class=""><a href="">Read</a></td>
+                        </tr>
+                    </tbody>
+                {% endfor %}
+            </table>
+        </div> 
+    </fieldset>
+
+{% endblock %}

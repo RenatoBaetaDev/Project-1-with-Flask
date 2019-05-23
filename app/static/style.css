@@ -71,3 +71,15 @@
 #body {
     padding-bottom: 50px;
 }
+
+.manga-synopsis {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;    
+}
+
+.mangas-chapter-image {
+    width: 600px;
+    height: 400px !important;
+}

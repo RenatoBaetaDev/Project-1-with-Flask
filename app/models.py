@@ -57,6 +57,7 @@ class Manga(db.Model):
 class Chapter(db.Model):
     __tablename__ = 'chapters'
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(64))
     manga_id = db.Column(db.Integer, db.ForeignKey('mangas.id'))
     number = db.Column(db.Integer)    
     release_date = db.Column(db.DateTime())

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+
+  <h1>Manga Edit</h1>
+  <div align="center">
+    <img class="mangas-chapter-image" alt="{{form.title.data}}" src="{{form.image.data}}">
+  </div>
+  {{ wtf.quick_form(form) }}
+
+{% endblock %}

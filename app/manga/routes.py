@@ -38,8 +38,27 @@ def register():
         db.session.add(manga)
         db.session.commit()
         flash('Manga Registered!')
-        return redirect(url_for('manga.list'))
     return render_template('manga/register.html', form=form)
+
+@manga.route('/manga/edit/<id>', methods=['GET','POST'])
+@login_required
+def edit(id):
+    manga = Manga.query.filter_by(id=id).first()
+    form = MangaRegistrationForm()
+    if form.validate_on_submit():
+
+        manga.title = form.title.data
+        manga.synopsis = form.synopsis.data
+        manga.release_date = form.release_date.data    
+
+        db.session.commit()        
+        return redirect(url_for('manga.list'))
+    form.title.data = manga.title
+    form.synopsis.data = manga.synopsis
+    form.release_date.data = manga.release_date   
+    form.image.data = url_for('static', filename='mangas/'+manga.image)
+    return render_template('manga/edit.html', form=form)
+
 
 @manga.route('/chapters/<id>')
 def chapters(id):

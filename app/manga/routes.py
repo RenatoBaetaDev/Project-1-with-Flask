@@ -22,7 +22,7 @@ def register():
         
         target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')        
         if not os.path.isdir(target):
-            os.mkdir(target)       
+            os.makedirs(target)       
 
         title = form.title.data
         ext = os.path.splitext(filename)[1]
@@ -33,7 +33,7 @@ def register():
             title=title,
             synopsis=form.synopsis.data,
             release_date=form.release_date.data,
-            image=title+ext
+            image="mangas/"+title+ext
         )
         db.session.add(manga)
         db.session.commit()
@@ -47,6 +47,21 @@ def edit(id):
     form = MangaRegistrationForm()
     if form.validate_on_submit():
 
+        target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')        
+        os.remove( os.path.join( manga.image ) )
+
+        file = request.files['image']
+        filename = file.filename     
+        
+        if not os.path.isdir(target):
+            os.makedirs(target)       
+
+        title = form.title.data
+        ext = os.path.splitext(filename)[1]
+        destination = "mangas/".join([target, title+ext])
+        file.save(destination)
+
+
         manga.title = form.title.data
         manga.synopsis = form.synopsis.data
         manga.release_date = form.release_date.data    
@@ -56,7 +71,7 @@ def edit(id):
     form.title.data = manga.title
     form.synopsis.data = manga.synopsis
     form.release_date.data = manga.release_date   
-    form.image.data = url_for('static', filename='mangas/'+manga.image)
+    form.image.data = url_for('static/mangas', filename=manga.image)
     return render_template('manga/edit.html', form=form)
 
 
@@ -64,5 +79,15 @@ def edit(id):
 def chapters(id):
     chapters = Chapter.query.filter_by(manga_id=id)
     manga = Manga.query.filter_by(id=id).first()
-    manga.image = url_for('static', filename='mangas/'+manga.image)
+    manga.image = url_for('static', filename=manga.image)
     return render_template('manga/chapters.html', chapters=chapters, manga=manga)
+
+@manga.route('/manga/delete/<int:id>')
+def delete(id):
+    manga = Manga.query.filter_by(id=id).first()
+    path = os.path.join(app.config['UPLOAD_FOLDER'], manga.image )
+    if (os.path.isfile(path)):
+        os.remove(path)    
+    db.session.delete(manga)
+    db.session.commit()
+    return redirect(url_for('manga.list'))

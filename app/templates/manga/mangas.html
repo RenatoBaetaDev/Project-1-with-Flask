@@ -24,7 +24,7 @@
 
                             {% if current_user.is_authenticated %}
                                 <td><a href="{{ url_for('manga.edit', id=manga.id) }}">Edit</a></td>
-                                <td><a href="">Delete</a></td>                                           
+                                <td><a href="{{ url_for('manga.delete', id=manga.id) }}">Delete</a></td>                                           
                             {% endif %}  
 
                         </tr>

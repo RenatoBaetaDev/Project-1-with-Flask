@@ -7,25 +7,14 @@ from app.models import User, Role, Manga
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
-    form = NameForm()
-    if form.validate_on_submit():
-        old_name = session.get('name')
-        if old_name is not None and old_name != form.name.data:
-            flash('Parece que você alterou o nome!')
-        session['name'] = form.name.data
-        return redirect(url_for('.index'))
-    return render_template('index.html', form=form, name=session.get('name'))
-
+    mangas = Manga.query.all()        
+    return render_template('index.html', mangas=mangas)
 
 @main.route('/user/<name>')
 @login_required
 def user(name):
     return render_template('user.html', name=name) 
 
-# @main.route('/mangas')
-# def mangas():
-#     mangas = Manga.query.all()
-#     return jsonify({'mangas': mangas})
 
 @main.route('/about')
 def about():

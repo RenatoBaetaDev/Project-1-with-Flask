@@ -9,49 +9,29 @@
 
             <div id="myCarousel" class="carousel slide" data-ride="carousel">
                 <ol class="carousel-indicators">
-                    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                    <li data-target="#myCarousel" data-slide-to="1"></li>
-                    <li data-target="#myCarousel" data-slide-to="2"></li>
+                    {% for manga in mangas %}
+                        <li data-target="#myCarousel" data-slide-to="{{ loop.index-1 }}" class="{% if loop.index == 1 %}active{% endif %}"></li>
+                    {% endfor %}
+
                 </ol>
                 
                 <div class="carousel-inner">
-                    <div class="item active">
-                        <img class="imagem-carrosel d-block w-100" src="{{ url_for('static', filename='log_horizon.jpg') }}" alt="Log Horizon">
-                        <div class="carousel-caption">
-                            <h4>
-                                <a onclick="mostrarPagina('mangas.html', 'loghorizonchapters')" href="#">Log Horizon</a>								
-                            </h4>
-                            <p>
-                                Elder Tale is an online fantasy RPG that has become popular worldwide. 
-                                But when its twelfth expansion package, "Novasphere Pioneers" is installed, thirty thousand players in Japan are trapped inside. 
-                                Among them is grad student Shiroe, who isn't very good at interacting with others.								
-                            </p>
-                        </div>                    
-                    </div>
-                
-                    <div class="item">
-                        <img class="imagem-carrosel d-block w-100" src="{{ url_for('static', filename='shingeki-no-kyojin.jpg') }}" alt="Shingeki no Kyojin">
-                        <div class="carousel-caption">
-                            <h4>
-                                <a onclick="mostrarPagina('mangas.html', 'shingekinokyojinchapters')" href="#">Shingeki no Kyojin</a>								
-                            </h4>
-                            <p>
-                                In 100 years, humanity lives in fear of the Titans. A race of beasts who take the appearance of humans but are much larger and lack sexual organs. Their only purpose is to feast upon humans. However, humanity barricaded themselves in three 50-meter walls to protect themselves from the terror of the Titans.							
-                            </p>
-                        </div>                    
-                    </div>
-                
-                    <div class="item">
-                        <img class="imagem-carrosel d-block w-100" src="{{ url_for('static', filename='one_piece.jpg') }}" alt="One Piece">
-						<div class="carousel-caption">
+
+                    {% for manga in mangas %}
+                        <div class="item {% if loop.index == 1 %}active{% endif %}">
+                            <img class="imagem-carrosel d-block w-100" src="{{ url_for('static', filename=manga.image) }}" alt="{{manga.title}}">
+                            <div class="carousel-caption">
                                 <h4>
-                                    <a onclick="mostrarPagina('mangas.html', 'onepiecechapters')" href="#">One Piece</a>								
+                                    <a href="{{ url_for('manga.edit', id=manga.id) }}">{{manga.title}}</a>								
                                 </h4>
                                 <p>
-                                    Follows the adventures of Monkey D. Luffy and his friends in order to find the greatest treasure ever left by the legendary Pirate, Gol D Roger. The famous mystery treasure named "One Piece"							
+                                    {{manga.synopsis}}
                                 </p>
-                            </div>                        
-                    </div>
+                            </div>     
+
+                        </div>
+                    {% endfor %}
+
                 </div>
                 
                 <a class="left carousel-control" href="#myCarousel" data-slide="prev">

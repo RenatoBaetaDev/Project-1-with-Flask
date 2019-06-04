@@ -2,7 +2,7 @@ import os
 from flask import session, redirect, url_for, flash, render_template, request, current_app as app
 from flask_login import login_required
 from . import manga
-from .forms import MangaRegistrationForm
+from .forms import MangaRegistrationForm, MangaEditForm
 from app.models import Manga, Chapter
 from werkzeug.utils import secure_filename
 from app import db
@@ -22,7 +22,7 @@ def register():
         
         target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')        
         if not os.path.isdir(target):
-            os.makedirs(target)       
+            os.mkdir(target)       
 
         title = form.title.data
         ext = os.path.splitext(filename)[1]
@@ -38,40 +38,59 @@ def register():
         db.session.add(manga)
         db.session.commit()
         flash('Manga Registered!')
+        return redirect(url_for('manga.list'))
+
     return render_template('manga/register.html', form=form)
 
 @manga.route('/manga/edit/<id>', methods=['GET','POST'])
 @login_required
 def edit(id):
     manga = Manga.query.filter_by(id=id).first()
-    form = MangaRegistrationForm()
+    form = MangaEditForm()
     if form.validate_on_submit():
 
-        target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')        
-        os.remove( os.path.join( manga.image ) )
-
         file = request.files['image']
-        filename = file.filename     
-        
-        if not os.path.isdir(target):
-            os.makedirs(target)       
+        filename = file.filename    
 
-        title = form.title.data
-        ext = os.path.splitext(filename)[1]
-        destination = "mangas/".join([target, title+ext])
-        file.save(destination)
+        if file:
+            path = os.path.join(app.config['UPLOAD_FOLDER'], manga.image)
+            if (os.path.isfile(path)):
+                os.remove(path)   
 
+            target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')        
+
+            if not os.path.isdir(target):
+                os.mkdir(target)       
+
+            title = form.title.data
+            ext = os.path.splitext(filename)[1]
+            destination = "/".join([target, title+ext])
+            file.save(destination)
+
+            manga.image = "mangas/"+title+ext 
+        else:
+            if manga.title != form.title.data:
+                target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')    
+                title = form.title.data
+                ext = os.path.splitext(filename)[1]               
+                destination = "/".join([target, title+ext])     
+                os.rename(
+                    os.path.join(app.config['UPLOAD_FOLDER'], manga.image),
+                    os.path.join(app.config['UPLOAD_FOLDER'], destination)      
+                )
+                manga.image = "mangas/"+title+ext 
+            
 
         manga.title = form.title.data
         manga.synopsis = form.synopsis.data
-        manga.release_date = form.release_date.data    
+        manga.release_date = form.release_date.data   
 
         db.session.commit()        
         return redirect(url_for('manga.list'))
     form.title.data = manga.title
     form.synopsis.data = manga.synopsis
     form.release_date.data = manga.release_date   
-    form.image.data = url_for('static/mangas', filename=manga.image)
+    form.image.data = url_for('static', filename=manga.image)
     return render_template('manga/edit.html', form=form)
 
 

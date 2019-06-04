@@ -23,6 +23,23 @@ class MangaRegistrationForm(FlaskForm):
     def validate_title(self, field):
         if Manga.query.filter_by(title=field.data).first():
             raise ValidationError('Manga already registered.')
+
+
+class MangaEditForm(FlaskForm):
+    title = StringField('Title', validators=[
+        DataRequired()
+    ])
+    synopsis = StringField('Synopsis', validators=[
+        DataRequired()
+    ])
+    image = FileField('Image')
+    
+    release_date = DateField('Release date', validators=[
+        DataRequired()
+    ])            
+    submit = SubmitField('Register')
+
+                   
        
 
        

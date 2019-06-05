@@ -7,7 +7,7 @@ from app.models import Manga, Chapter
 from werkzeug.utils import secure_filename
 from app import db
 
-@manga.route('/list')
+@manga.route('/mangas/list')
 def list():
     mangas = Manga.query.all()
     return render_template('manga/mangas.html', mangas=mangas)

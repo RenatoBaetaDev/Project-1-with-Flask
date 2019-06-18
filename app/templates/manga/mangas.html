@@ -14,8 +14,8 @@
                     <div class="card-body">
                     <p class="card-text">{{ manga.title }}</p>
                     <p class="card-text">{{ manga.message }}</p>
-                    <p class="card-text ">{{manga.synopsis}}</p>
-                    <p class="card-text">Release Date: {{manga.release_date.strftime('%m/%d/%Y')}} </p>                    
+                    <p class="overflow-auto card-text card-manga-list">{{manga.synopsis}}</p>                        
+                    <p class="card-text">Release Date: {{manga.release_date.strftime('%d/%m/%Y')}} </p>                    
                     <div class="d-flex justify-content-between align-items-center">
                         <button type="button" class="btn btn-sm btn-success"><a class="btn-success" style="text-decoration:none;" href="{{ url_for('manga.chapters', id=manga.id) }}" >Read</a></button>
 

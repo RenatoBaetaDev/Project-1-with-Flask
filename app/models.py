@@ -61,6 +61,14 @@ class Chapter(db.Model):
     manga_id = db.Column(db.Integer, db.ForeignKey('mangas.id'))
     number = db.Column(db.Integer)    
     release_date = db.Column(db.DateTime())
+    pages = db.relationship('Page', backref='chapter')
 
     def __repr__(self):
         return '<Chapter %r>' % self.number     
+
+class Page(db.Model):
+    __tablename__ = 'pages'
+    id = db.Column(db.Integer, primary_key=True)
+    chapter_id = db.Column(db.Integer, db.ForeignKey('chapters.id'))
+    page_number = db.Column(db.Integer)
+    image = db.Column(db.String(128))

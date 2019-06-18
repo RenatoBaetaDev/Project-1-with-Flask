@@ -85,5 +85,10 @@
 
 .mangas-thumb {
     width: 400px !important;
-    height: 150px !important;
+    height: 200px !important;
+}
+
+.card-manga-list {
+    max-height: 100px;           
+    overflow-y: scroll;    
 }

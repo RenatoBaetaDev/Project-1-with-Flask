@@ -13,55 +13,53 @@
 
 
 {% block navbar %}
-    <div class="navbar navbar-inverse " role="navigation">
-        <div class="container">
-            <div class="navbar-header">
-                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a href="{{ url_for('main.index') }}" role="button" class="navbar-brand">Home</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-left">
-                    <li>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Nameless Mangas</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+    
+        <div class="collapse navbar-collapse" id="navbarColor01">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="{{ url_for('main.index') }}" >Home <span class="sr-only">(current)</span></a>
+            </li>
+
+            <li class="nav-item">            
+                <a class="nav-link" href="{{ url_for('manga.list') }}" role="button">Mangas</a>                    
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('main.about') }}" href="#" role="button">About</a>                    
+            </li>             
+          </ul>            
+
+            <ul class="navbar-nav navbar-right">
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">                    
+                        <a class="nav-link" href="{{ url_for('manga.register') }}">
+                            Mangas Register
+                        </a>
                     </li>
-                    <li>
-                        <a href="{{ url_for('manga.list') }}" role="button">Mangas</a>                    
+                    <li class="nav-item">                    
+                        <a class="nav-link" href="{{ url_for("auth.logout") }}">
+                            Log out
+                        </a>
                     </li>
-                    <li>
-                        <a href="{{ url_for('main.about') }}" href="#" role="button">About</a>                    
-                    </li>                    
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    {% if current_user.is_authenticated %}
-                        <li>
-                            <a href="{{ url_for('manga.register') }}">
-                                Mangas Register
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url_for("auth.logout") }}">
-                                Log out
-                            </a>
-                        </li>
-                    {% else %}
-                        <li>
-                            <a href="{{ url_for('auth.register') }}" role="button" >Register</a>  
-                        </li>
-                  
-                        <li>
-                            <a href="{{ url_for("auth.login") }}">
-                                Log in
-                            </a>
-                        </li>
-                    {% endif %}                    
-                </ul>
-            </div>
+                {% else %}
+                    <li class="nav-item">                    
+                        <a class="nav-link" href="{{ url_for('auth.register') }}" role="button" >Register</a>  
+                    </li>
+              
+                    <li class="nav-item">                    
+                        <a class="nav-link" href="{{ url_for("auth.login") }}">
+                            Log in
+                        </a>
+                    </li>
+                {% endif %}                    
+            </ul>          
         </div>
-    </div>
+    </nav>
 {% endblock %}
 
 {% block content %}

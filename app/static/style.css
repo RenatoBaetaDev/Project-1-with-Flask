@@ -73,7 +73,6 @@
 }
 
 .manga-synopsis {
-    max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;    
@@ -85,6 +84,6 @@
 }
 
 .mangas-thumb {
-    width: 100px !important;
-    height: 50px !important;
+    width: 400px !important;
+    height: 150px !important;
 }

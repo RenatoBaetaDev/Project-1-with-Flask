@@ -41,6 +41,12 @@ def load_user(user_id):
     return User.query.get(int(user_id))
     
 
+def dump_datetime(value):
+    """Deserialize datetime object into string form for JSON processing."""
+    if value is None:
+        return None
+    return [value.strftime("%d-%m-%Y")]
+
 class Manga(db.Model):
     __tablename__ = 'mangas'
     id = db.Column(db.Integer, primary_key=True)
@@ -53,6 +59,24 @@ class Manga(db.Model):
 
     def __repr__(self):
         return '<Manga %r>' % self.title    
+
+    @property
+    def serialize(self):
+       """Return object data in easily serializable format"""
+       return {
+           'id'         : self.id,
+           'title'      : self.title,
+           'release_date': dump_datetime(self.release_date),
+           # This is an example how to deal with Many2Many relations
+        #    'many2many'  : self.serialize_many2many
+       }
+    @property
+    def serialize_many2many(self):
+       """
+       Return object's relations in easily serializable format.
+       NB! Calls many2many's serialize property.
+       """
+       return [ item.serialize for item in self.many2many]        
 
 class Chapter(db.Model):
     __tablename__ = 'chapters'

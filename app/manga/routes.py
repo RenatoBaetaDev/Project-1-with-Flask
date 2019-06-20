@@ -1,5 +1,5 @@
 import os
-from flask import session, redirect, url_for, flash, render_template, request, current_app as app
+from flask import session, redirect, url_for, flash, render_template, jsonify,request, current_app as app
 from flask_login import login_required
 from . import manga
 from .forms import MangaRegistrationForm, MangaEditForm
@@ -94,12 +94,12 @@ def edit(id):
     return render_template('manga/edit.html', form=form)
 
 
-@manga.route('/chapters/<id>')
-def chapters(id):
+@manga.route('/read/<id>')
+def read(id):
     chapters = Chapter.query.filter_by(manga_id=id)
     manga = Manga.query.filter_by(id=id).first()
     manga.image = url_for('static', filename=manga.image)
-    return render_template('manga/chapters.html', chapters=chapters, manga=manga)
+    return render_template('manga/read.html', chapters=chapters, manga=manga)
 
 @manga.route('/manga/delete/<int:id>')
 def delete(id):
@@ -110,3 +110,18 @@ def delete(id):
     db.session.delete(manga)
     db.session.commit()
     return redirect(url_for('manga.list'))
+
+@manga.route('/chapters')
+def chapters():
+    return render_template('manga/chapters.html')
+
+@manga.route('/getmangas')
+def getmangas():
+    mangas = Manga.query.all()
+    return jsonify(mangas=[i.serialize for i in mangas])
+
+@manga.route('/getchapters')
+def getChapters():  
+    mangaId = request.args.get('manga', 0, type=int)
+    chapters = Chapter.query.filter_by(manga_id=mangaId)    
+    return jsonify(chapters=[i.serialize for i in chapters])

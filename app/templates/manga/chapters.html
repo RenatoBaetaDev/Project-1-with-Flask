@@ -2,43 +2,79 @@
 
 {% block page_content %}
 
-    <div class="text-center">
-        <img class="mangas-chapter-image" alt="{{manga.title}}" src="{{manga.image}}">
-    </div>        
 
-    <fieldset class="rounded  bg-dark ">
-        <legend class="w-auto" align="center">
-            <h1> 
-                <button class="badge badge-primary" type="button" data-toggle="collapse" data-target="#{{manga.id}}" aria-expanded="false" aria-controls="{{manga.id}}">
-                    {{manga.title}}
-                </button>
-            </h1>
-        </legend>
+<div class="album py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <form>
+                    <div class="form-group">
+                        <label for="mangas">Mangas</label>
+                        <select class="form-control" id="mangas" name="mangas">
+                            <option>Select manga</option>
+                        </select>
+                    </div>
+                </form>   
+            </div>                 
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-hover">
+                    <thead>
+                        <th>Chapter</th>
+                        <th>Title</th>
+                        <th>Manga</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                    </thead>
+                    <tbody id="chapters"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        $(document).ready(function(){
+            getMangas();       
+
+            $("#mangas").on("change", function(){
+                getChaptersByManga($(this).val());
+            });
+        })
 
 
-        <div class="collapse" id="{{manga.id}}">                 
+        function addOptionToSelect(manga){
+            const option = `<option value="${manga.id}">${manga.title}</option>`;
+            $("#mangas").append(option)
+        }
 
-            <table class="table mangas-chapter text-light text-center ">
-                <thead>
-                    <td>Number</td>
-                    <td>Title</td>
-                    <td>Date</td>
-                </thead>
+        function getMangas(){
+            
+            $.getJSON(" {{ url_for('manga.getmangas') }} ", function(data){                
+                for (let i = 0; i < data['mangas'].length; i++)           
+                    addOptionToSelect(data.mangas[i]);
+            })
+        }
 
-                {% for chapter in chapters %}
-                    <tbody>
-                        <tr>
-                            <td class="">
-                                <a href="#">chapter.number</a>    
-                            </td>
-                            <td class="">chapter.title</td>
-                            <td class="">chapter.release_date.strftime('%m/%d/%Y')</td>
-                            <td class=""><a href="">Read</a></td>
-                        </tr>
-                    </tbody>
-                {% endfor %}
-            </table>
-        </div> 
-    </fieldset>
+        function mountTable(chapters){
+            $("#chapters").html("");
+            let html = "";
+            if (chapters.length == 0)
+                html = "<tr class='text-center'><td colspan=5>No chapters where found</td></tr>"
+            $("#chapters").append(html);
+        }
 
+        function getChaptersByManga(manga){
+            $.getJSON("{{ url_for('manga.getChapters') }}", {manga:manga}, function(data){
+                mountTable(data.chapters);
+            })
+        }
+
+    </script>
 {% endblock %}

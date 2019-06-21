@@ -1,5 +1,5 @@
 import os
-from flask import session, redirect, url_for, flash, render_template, jsonify,request, current_app as app
+from flask import request, session, redirect, url_for, flash, render_template, jsonify,request, current_app as app
 from flask_login import login_required
 from . import manga
 from .forms import MangaRegistrationForm, MangaEditForm
@@ -125,3 +125,10 @@ def getChapters():
     mangaId = request.args.get('manga', 0, type=int)
     chapters = Chapter.query.filter_by(manga_id=mangaId)    
     return jsonify(chapters=[i.serialize for i in chapters])
+
+@manga.route('/newchapter', methods=['GET','POST'])
+def newChapter():
+    uploaded_files = request.files.getlist("page[]")
+    for file in uploaded_files:
+        print(file    )
+    return render_template('/manga/chapter/new.html')

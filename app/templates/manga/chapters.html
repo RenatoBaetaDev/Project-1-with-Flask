@@ -19,6 +19,15 @@
         </div>
 
         <div class="row">
+            <div class="col-md-12 text-center">
+                <a href="{{ url_for('manga.newChapter') }}" role="button" class="btn btn-success">New Chapter</a>
+            </div>
+        </div>
+
+        </br>
+        </br>
+
+        <div class="row">
             <div class="col-md-12">
                 <table class="table table-hover">
                     <thead>
@@ -43,9 +52,11 @@
         $(document).ready(function(){
             getMangas();       
 
-            $("#mangas").on("change", function(){
-                getChaptersByManga($(this).val());
-            });
+            // $("#mangas").on("change", function(){
+            //     getChaptersByManga($(this).val());
+            // });
+
+            $("#mangas").on("change", () => getChaptersByManga($(this).val()) );            
         })
 
 
@@ -66,14 +77,15 @@
             $("#chapters").html("");
             let html = "";
             if (chapters.length == 0)
-                html = "<tr class='text-center'><td colspan=5>No chapters where found</td></tr>"
+                html = "<tr class='text-center'><td colspan=5>No chapters were found</td></tr>"
             $("#chapters").append(html);
         }
 
         function getChaptersByManga(manga){
-            $.getJSON("{{ url_for('manga.getChapters') }}", {manga:manga}, function(data){
-                mountTable(data.chapters);
-            })
+            // $.getJSON("{{ url_for('manga.getChapters') }}", {manga:manga}, function(data){
+            //     mountTable(data.chapters);
+            // })
+            $.getJSON("{{ url_for('manga.getChapters') }}", {manga:manga}, (data) => mountTable(data.chapters) )            
         }
 
     </script>

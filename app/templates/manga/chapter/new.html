@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+<div class="album py-5 bg-light col-md-6 offset-md-3">
+    <div class="row">    
+        <div class="container text-center">
+            <h1>New Chapter</h1>
+            <form action="{{ url_for('manga.newChapter') }}" enctype="multipart/form-data">
+
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div class="form-group">
+                            <label for="mangas">Manga</label>
+                            <select name="mangas" id="mangas" class="form-control">
+                                <option value="">Select Manga</option>
+                            </select>                        
+                        </div>       
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" name="title" id="title" class="form-control">                    
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="number">Number</label>
+                            <input type="text" name="number" id="number" class="form-control">                    
+                        </div>                    
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="pages">Number of Pages</label>
+                            <input type="number" name="pages" id="pages" class="form-control" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" id="pageFiles"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="{{ url_for('manga.chapters') }}" role="button" class="btn btn-danger" >Cancel</a>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        let actualNumberOfPages = 0
+        $(document).ready(function(){
+            getMangas();       
+            $("#mangas").on("change", () => getChaptersByManga($(this).val()) );                
+            $("#pages").on("change", function(){
+                verifyInputFiles($(this).val())
+            })     
+        })        
+
+        function appendInputFiles(num){
+            let html = ""
+            for (let i = actualNumberOfPages+1; i <= num; i++)
+            {
+                html = `<div class="form-group">
+                            <label for="page[${i}]">Page ${i}</label>
+                            <input type="file" name="page[${i}]" id="page[${i}]" class="form-control">
+                        </div>`
+                $("#pageFiles").append(html)
+            }
+        }
+
+        function verifyInputFiles(num){
+            if (actualNumberOfPages > num)
+                removeInputFiles(num)
+            else
+                appendInputFiles(num)
+            actualNumberOfPages = num;
+        }
+
+        function addOptionToSelect(manga){
+            const option = `<option value="${manga.id}">${manga.title}</option>`;
+            $("#mangas").append(option)
+        }
+
+        function getMangas(){
+            
+            $.getJSON(" {{ url_for('manga.getmangas') }} ", function(data){                
+                for (let i = 0; i < data['mangas'].length; i++)           
+                    addOptionToSelect(data.mangas[i]);
+            })
+        }
+
+        function mountTable(chapters){
+            $("#chapters").html("");
+            let html = "";
+            if (chapters.length == 0)
+                html = "<tr class='text-center'><td colspan=5>No chapters were found</td></tr>"
+            $("#chapters").append(html);
+        }
+
+        function getChaptersByManga(manga){
+            // $.getJSON("{{ url_for('manga.getChapters') }}", {manga:manga}, function(data){
+            //     mountTable(data.chapters);
+            // })
+            $.getJSON("{{ url_for('manga.getChapters') }}", {manga:manga}, (data) => mountTable(data.chapters) )            
+        }
+
+    </script>
+{% endblock %}

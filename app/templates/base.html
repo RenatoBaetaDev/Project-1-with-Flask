@@ -9,6 +9,8 @@
     <link rel="icon" type="imagem/png" href="{{ url_for('static', filename='bleach.jpg') }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">	
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 {% endblock %}
 
 
@@ -80,40 +82,42 @@
 
 
 	<div class="footer" id="page-footer">
-        <br/>
-		<div class="row text-center">
-			<div class="col-md-4">
-				<p >
-					Location: <br>
-					Street: 77 Massachusetts <br> 
-					Ave Cambridge, MA 02139, EUA	
-				</p>			
-			</div>
-			<div class="col-md-4">
-				Contact <br>
-				Phone: 9999999999 <br>
-				E-mail: namelessMangas@email.com
+        <div class="container text-center text-md-left">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <p >
+                        Location: <br>
+                        Street: 77 Massachusetts <br> 
+                        Ave Cambridge, MA 02139, EUA	
+                    </p>			
+                </div>
+                <div class="col-md-4">
+                    Contact <br>
+                    Phone: 9999999999 <br>
+                    E-mail: namelessMangas@email.com
 
-				<div class="footer-copyright text-center py-3">&copy; 2019 Copyright:
-					<a onclick="{{ url_for('main.about') }}"  href="#"> Nameless Mangás</a>
-				</div>
-			</div>
-			<div class="col-md-4">
-				Social Medias
-				<ul class=" list-unstyled">
-					<li>				
-						<a href="#" class="fa fa-facebook"></a>
-					</li>
-					<li>				
-						<a href="#" class="fa fa-twitter"></a>
-					</li>
-					<li>				
-						<a href="#" class="fa fa-instagram"></a>
-					</li>
-				</ul>
-			</div>
-		</div>
-    </div>    
+                    <div class="footer-copyright text-center py-3">&copy; 2019 Copyright:
+                        <a onclick="{{ url_for('main.about') }}"  href="#"> Nameless Mangás</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    Social Medias
+                    <ul class=" list-unstyled">
+                        <li>				
+                            <a href="#" class="fa fa-facebook"></a>
+                        </li>
+                        <li>				
+                            <a href="#" class="fa fa-twitter"></a>
+                        </li>
+                        <li>				
+                            <a href="#" class="fa fa-instagram"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>    
+    </div>
+
     
 {% endblock %}
 

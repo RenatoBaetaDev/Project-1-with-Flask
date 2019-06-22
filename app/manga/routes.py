@@ -128,7 +128,11 @@ def getChapters():
 
 @manga.route('/newchapter', methods=['GET','POST'])
 def newChapter():
-    uploaded_files = request.files.getlist("page[]")
-    for file in uploaded_files:
-        print(file    )
+    # uploaded_files = request.files.getlist("page[]")
+    # for file in uploaded_files:
+    #     print(file)
+    # dict = request.form
+    # for key in dict:
+    #     print('form key '+dict[key])
+
     return render_template('/manga/chapter/new.html')

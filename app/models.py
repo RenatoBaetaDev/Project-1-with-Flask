@@ -2,6 +2,8 @@ from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from . import login_manager
+from datetime import datetime
+
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -12,6 +14,12 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.name
 
+class Rate(db.Model):
+    __tablename__ = 'rates'
+    manga_id = db.Column(db.Integer, db.ForeignKey('mangas.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    value = db.Column(db.Integer)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -20,6 +28,12 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), unique=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     password_hash = db.Column(db.String(128))
+    rated_mangas = db.relationship(
+        'Rate', foreign_keys=[Rate.user_id],
+        backref=db.backref('rated', lazy='joined'),
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -35,6 +49,22 @@ class User(UserMixin, db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def alreadyRated(self, manga):
+        return self.rated_mangas.filter_by(
+            manga_id=manga.id
+        ).first() is not None
+
+    def rate(self, manga, value):
+        if not self.alreadyRated(manga):
+            rate = Rate(user_id=self, manga_id=manga, value=value)            
+            db.session.add(rate)
+            db.session.commit()
+
+    def unrate(self, manga):
+        rate = self.rated_mangas.filter(manga_id=manga.id).first()
+        if rate:
+            db.session.delete(rate)
+            db.session.commit
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -56,6 +86,13 @@ class Manga(db.Model):
     image = db.Column(db.String(128))
     release_date = db.Column(db.DateTime())
     conclusion_date = db.Column(db.DateTime())
+
+    users_rate = db.relationship(
+        'Rate', foreign_keys=[Rate.manga_id],
+        backref=db.backref('whoRated', lazy='joined'),
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )        
 
     def __repr__(self):
         return '<Manga %r>' % self.title    
@@ -96,3 +133,4 @@ class Page(db.Model):
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapters.id'))
     page_number = db.Column(db.Integer)
     image = db.Column(db.String(128))
+

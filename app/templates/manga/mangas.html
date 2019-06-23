@@ -12,13 +12,16 @@
                 <div class="card mb-4 shadow-sm">
                     <img class="card-img-top figure-img img-fluid rounded mangas-thumb" alt="{{manga.title}}" src="{{ url_for('static', filename=manga.image) }}">
                     <div class="card-body">
-                    <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
-                        <input type="radio" id="star5-[{{manga.id}}]" name="rating" value="5" /><label for="star5-[{{manga.id}}]" title="5 star-[{{manga.id}}]">5</label>
-                        <input type="radio" id="star4-[{{manga.id}}]" name="rating" value="4" /><label for="star4-[{{manga.id}}]" title="4 star-[{{manga.id}}]">4</label>
-                        <input type="radio" id="star3-[{{manga.id}}]" name="rating" value="3" /><label for="star3-[{{manga.id}}]" title="3 star-[{{manga.id}}]">3</label>
-                        <input type="radio" id="star2-[{{manga.id}}]" name="rating" value="2" /><label for="star2-[{{manga.id}}]" title="2 star-[{{manga.id}}]">2</label>
-                        <input type="radio" id="star1-[{{manga.id}}]" name="rating" value="1" /><label for="star1-[{{manga.id}}]" title="1 star-[{{manga.id}}]">1</label>
-                    </div>
+                    {% if current_user.is_authenticated %}
+                        <div class="starrating risingstar d-flex justify-content-center flex-row-reverse">
+                            <input type="radio" {{ 'checked' if manga.rate == 5 }} manga-id="{{manga.id}}" id="star5-[{{manga.id}}]" name="rating-[{{manga.id}}]" value="5" /><label for="star5-[{{manga.id}}]" title="5 star-[{{manga.id}}]">5</label>
+                            <input type="radio" {{ 'checked' if manga.rate == 4 }} manga-id="{{manga.id}}" id="star4-[{{manga.id}}]" name="rating-[{{manga.id}}]" value="4" /><label for="star4-[{{manga.id}}]" title="4 star-[{{manga.id}}]">4</label>
+                            <input type="radio" {{ 'checked' if manga.rate == 3 }} manga-id="{{manga.id}}" id="star3-[{{manga.id}}]" name="rating-[{{manga.id}}]" value="3" /><label for="star3-[{{manga.id}}]" title="3 star-[{{manga.id}}]">3</label>
+                            <input type="radio" {{ 'checked' if manga.rate == 2 }} manga-id="{{manga.id}}" id="star2-[{{manga.id}}]" name="rating-[{{manga.id}}]" value="2" /><label for="star2-[{{manga.id}}]" title="2 star-[{{manga.id}}]">2</label>
+                            <input type="radio" {{ 'checked' if manga.rate == 1 }} manga-id="{{manga.id}}" id="star1-[{{manga.id}}]" name="rating-[{{manga.id}}]" value="1" /><label for="star1-[{{manga.id}}]" title="1 star-[{{manga.id}}]">1</label>
+                        </div>
+                    {% endif %}                              
+
                     <p class="card-text">{{ manga.title }}</p>
                     <p class="card-text">{{ manga.message }}</p>
                     <p class="overflow-auto card-text card-manga-list">{{manga.synopsis}}</p>                        
@@ -51,7 +54,12 @@
         <script>
             $(document).ready(function(){
                 $(".starrating > input").on("change", function(){
-                    console.log($(this).val())
+                    const rate = {
+                        manga: $(this).attr('manga-id'),
+                        value: $(this).val()
+                    }
+                    console.log(rate)
+                    $.post("{{ url_for('manga.rate') }}", rate, (data) => console.log(data))                    
                 })
             })
         

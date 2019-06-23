@@ -3,13 +3,15 @@ from flask import request, session, redirect, url_for, flash, render_template, j
 from flask_login import login_required
 from . import manga
 from .forms import MangaRegistrationForm, MangaEditForm
-from app.models import Manga, Chapter
+from app.models import Manga, Chapter, Rate
 from werkzeug.utils import secure_filename
 from app import db
 
 @manga.route('/mangas/list')
 def list():
     mangas = Manga.query.all()
+    for manga in mangas:
+        manga.rate = manga.userRate(session["user_id"])
     return render_template('manga/mangas.html', mangas=mangas)
 
 @manga.route('/mangas/register', methods=['GET','POST'])
@@ -136,3 +138,26 @@ def newChapter():
     #     print('form key '+dict[key])
 
     return render_template('/manga/chapter/new.html')
+
+@manga.route('/rate', methods=['POST'])
+def rate():
+    mangaId = request.form.get('manga', 0, type=int)
+    userId = session['user_id']
+    value = request.form.get('value', 0, type=int)
+    # If the user already rated this manga, it will only update that rate
+    rate = Rate.query.filter(Rate.user_id==userId, Rate.manga_id==mangaId).first()  
+    if rate is not None:
+        rate.manga_id=mangaId
+        rate.user_id=userId          
+        rate.value = value
+        db.session.commit()
+        return jsonify(result="editou de boas")
+    
+    rate = Rate(
+        manga_id=mangaId,
+        user_id=userId,
+        value=value
+    )
+    db.session.add(rate)
+    db.session.commit()    
+    return jsonify(result="salvou de boas")

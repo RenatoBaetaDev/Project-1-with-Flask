@@ -1,6 +1,6 @@
 
 body {
-    background-image: linear-gradient(to left, rgba(240, 240, 240, 0.596) 0%,rgba(0,0,0,0.6) 100%), url("bleach.jpg");
+    background-image: linear-gradient(to right, rgba(240, 240, 240, 0.829) 0%,rgba(0,0,0,0.6) 100%), url("bleach.jpg");
 }
 
 .imagem-carrosel{

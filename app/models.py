@@ -94,6 +94,14 @@ class Manga(db.Model):
         cascade='all, delete-orphan'
     )        
 
+    def userRate(self, user):
+        rate = self.users_rate.filter_by(
+            user_id=user
+        ).first() # is not None    
+        if rate is not None:
+            return rate.value
+        return 0
+
     def __repr__(self):
         return '<Manga %r>' % self.title    
 

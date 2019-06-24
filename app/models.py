@@ -49,9 +49,9 @@ class User(UserMixin, db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def alreadyRated(self, manga):
+    def alreadyRated(self, mangaId):
         return self.rated_mangas.filter_by(
-            manga_id=manga.id
+            manga_id=mangaId
         ).first() is not None
 
     def rate(self, manga, value):
@@ -60,8 +60,8 @@ class User(UserMixin, db.Model):
             db.session.add(rate)
             db.session.commit()
 
-    def unrate(self, manga):
-        rate = self.rated_mangas.filter(manga_id=manga.id).first()
+    def unrate(self, mangaId):
+        rate = self.rated_mangas.filter_by(manga_id=mangaId).first()
         if rate:
             db.session.delete(rate)
             db.session.commit

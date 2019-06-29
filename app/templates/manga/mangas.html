@@ -58,7 +58,6 @@
                         manga: $(this).attr('manga-id'),
                         value: $(this).val()
                     }
-                    console.log(rate)
                     $.post("{{ url_for('manga.rate') }}", rate, (data) => console.log(data))                    
                 })
             })

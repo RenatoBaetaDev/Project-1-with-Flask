@@ -119,3 +119,8 @@ body {
 
 .starrating > input:hover ~ label
 { color: #ffca08 ;  } /* Set yellow color when star hover */
+
+.chapter-image{
+    width: 1200px;
+    height: 800px !important;
+}

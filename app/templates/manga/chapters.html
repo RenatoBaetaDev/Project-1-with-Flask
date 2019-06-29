@@ -33,8 +33,6 @@
                     <thead>
                         <th>Chapter</th>
                         <th>Title</th>
-                        <th>Manga</th>
-                        <th>&nbsp;</th>
                         <th>&nbsp;</th>
                     </thead>
                     <tbody id="chapters"></tbody>
@@ -52,11 +50,11 @@
         $(document).ready(function(){
             getMangas();       
 
-            // $("#mangas").on("change", function(){
-            //     getChaptersByManga($(this).val());
-            // });
+            $("#mangas").on("change", function(){
+                getChaptersByManga($(this).val());
+            });
 
-            $("#mangas").on("change", () => getChaptersByManga($(this).val()) );            
+            // $("#mangas").on("change",  () => {getChaptersByManga($(this).val())} );            
         })
 
 
@@ -73,11 +71,26 @@
             })
         }
 
+        function mountTr(chapter)
+        {
+            let html = `<tr>                            
+                            <td>${chapter.number}</td>
+                            <td>${chapter.title}</td>                            
+                            <td>
+                                <button class="btn btn-danger" onClick="deleteChapter(${chapter.id})">Delete</button>
+                            </td>
+                        </tr>`;            
+            return html;
+        }
+
         function mountTable(chapters){
             $("#chapters").html("");
             let html = "";
             if (chapters.length == 0)
                 html = "<tr class='text-center'><td colspan=5>No chapters were found</td></tr>"
+            else
+                for(let i = 0; i < chapters.length; i++)
+                    html += mountTr(chapters[i])
             $("#chapters").append(html);
         }
 
@@ -86,6 +99,10 @@
             //     mountTable(data.chapters);
             // })
             $.getJSON("{{ url_for('manga.getChapters') }}", {manga:manga}, (data) => mountTable(data.chapters) )            
+        }
+
+        function deleteChapter(chapterId){
+            $.post("{{ url_for('manga.deleteChapter') }}", {id: chapterId}, (data) => getChaptersByManga($("#mangas").val()))                
         }
 
     </script>

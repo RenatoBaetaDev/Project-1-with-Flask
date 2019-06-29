@@ -6,49 +6,95 @@
         <img class="mangas-chapter-image" alt="{{manga.title}}" src="{{manga.image}}">
     </div>        
 
-    <fieldset class="rounded  bg-dark ">
-        <legend class="w-auto" align="center">
-            <h1> 
-                <button class="badge badge-primary" type="button" data-toggle="collapse" data-target="#{{manga.id}}" aria-expanded="false" aria-controls="{{manga.id}}">
-                    {{manga.title}}
-                </button>
-            </h1>
-        </legend>
+    <div class="album py-5 bg-white">
+        <div class="container">    
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-hover">
+                        <thead>
+                            <th>Chapter</th>
+                            <th>Title</th>
+                            <th>&nbsp;</th>
+                        </thead>
+                        <tbody id="chapters">
+                            {% for chapter in chapters %}
+                                <td>{{chapter.number}}</td>
+                                <td>{{chapter.title}}</td>
+                                <td><button class="btn btn-info" data-toggle="modal" data-target="#modal" onClick="getPages({{chapter.id}})">Read</button></td>                                    
+                            {% endfor %}                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+    </div>
 
-
-        <div class="collapse" id="{{manga.id}}">                 
-
-            <table class="table mangas-chapter text-light text-center ">
-                <thead>
-                    <td>Number</td>
-                    <td>Title</td>
-                    <td>Date</td>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                </thead>
-
-                {% for chapter in chapters %}
-                    <tbody>
-                        <tr>
-                            <td class="">
-                                <a href="#">chapter.number</a>    
-                            </td>
-                            <td class="">chapter.title</td>
-                            <td class="">chapter.release_date.strftime('%m/%d/%Y')</td>
-                            <td class=""><a href="">Read</a></td>
-                            {% if current_user.is_authenticated %}
-                                <button type="button" class="btn btn-sm btn-primary" >
-                                    <a class="btn-primary" style="text-decoration:none;" href="{{ url_for('manga.edit', id=manga.id) }}" >Edit</a>                                
-                                </button>
-                                <button type="button" class="btn btn-sm btn-danger" >
-                                    <a class="btn-danger" style="text-decoration:none;" href="{{ url_for('manga.delete', id=manga.id) }}" >Delete</a>                                                                
-                                </button>
-                            {% endif %}                               
-                        </tr>
-                    </tbody>
-                {% endfor %}
-            </table>
-        </div> 
-    </fieldset>
+    <div class="modal" tabindex="-1" role="dialog" id="modal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{manga.title}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body"> 
+                    <div id="carouselChapter" class="carousel slide" data-ride="carousel" data-interval="false">
+                
+                        <ol class="carousel-indicators">                    
+                        </ol>
+                        <div class="carousel-inner">
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselChapter" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselChapter" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>                                    
+                </div>
+            </div>
+        </div>
+    </div>    
 
 {% endblock %}
+
+{% block scripts %}
+    {{super()}}
+
+    <script>
+
+    function createCarrouselIndicators(pages){
+        $(".carousel-indicators").html('')
+        let html = ''
+        for(let i = 0; i < pages.length; i++)
+            html += `<li data-target="#carouselChapter" data-slide-to="${i}" class="${(i == 0) ? "active" : ""}"></li>`
+
+        $(".carousel-indicators").html(html)
+    }
+
+    function populateCarrousel(pages){
+        createCarrouselIndicators(pages)
+        $('.carousel-inner').html('');
+        let html = ''
+
+        for(let i = 0; i < pages.length; i++)
+        {
+            html += `
+                    <div class="carousel-item ${(i == 0) ? 'active' : ''}">
+                        <img class="chapter-image d-block w-100" src="${pages[i].image}" alt="test">  
+                    </div>
+                    `                    
+        }
+        $('.carousel-inner').html(html);
+    }
+    
+    function getPages(chapterId){
+        $.getJSON("{{ url_for('manga.getPages') }}", {id:chapterId}, (data) => populateCarrousel(data.pages) )                          
+    }
+    
+    </script>
+{% endblock %}
+

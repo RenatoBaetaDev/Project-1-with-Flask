@@ -3,14 +3,15 @@ from flask import request, session, redirect, url_for, flash, render_template, j
 from flask_login import login_required
 from . import manga
 from .forms import MangaRegistrationForm, MangaEditForm
-from app.models import Manga, Chapter, Rate, User
+from app.models import Manga, Chapter, Page, Rate, User
 from werkzeug.utils import secure_filename
 from app import db
+from datetime import datetime
 
 @manga.route('/mangas/list')
 def list():
     mangas = Manga.query.all()
-    if session:
+    if session.get('user_id'):
         for manga in mangas:
             manga.rate = manga.userRate(session["user_id"])
     return render_template('manga/mangas.html', mangas=mangas)
@@ -99,10 +100,10 @@ def edit(id):
 
 @manga.route('/read/<id>')
 def read(id):
-    chapters = Chapter.query.filter_by(manga_id=id)
     manga = Manga.query.filter_by(id=id).first()
     manga.image = url_for('static', filename=manga.image)
-    return render_template('manga/read.html', chapters=chapters, manga=manga)
+    chapters = Chapter.query.filter_by(manga_id=id)
+    return render_template('manga/read.html', chapters=chapters,manga=manga)
 
 @manga.route('/manga/delete/<int:id>')
 def delete(id):
@@ -129,14 +130,89 @@ def getChapters():
     chapters = Chapter.query.filter_by(manga_id=mangaId)    
     return jsonify(chapters=[i.serialize for i in chapters])
 
+@manga.route('/deletechapter', methods=['POST'])
+def deleteChapter():
+    chapterId = request.form.get('id', 0, type=int)
+    chapter = Chapter.query.filter_by(id=chapterId).first()
+
+    pages = Page.query.filter_by(chapter_id=chapterId)
+    if pages:
+        for page in pages:
+            path = os.path.join(app.config['UPLOAD_FOLDER'], page.image )
+            if (os.path.isfile(path)):
+                os.remove(path)
+            db.session.delete(page)
+            db.session.commit()
+
+    db.session.delete(chapter)
+    db.session.commit()
+    return jsonify(result="deleted")
+
 @manga.route('/newchapter', methods=['GET','POST'])
 def newChapter():
-    # uploaded_files = request.files.getlist("page[]")
-    # for file in uploaded_files:
-    #     print(file)
-    # dict = request.form
-    # for key in dict:
-    #     print('form key '+dict[key])
+    if request.method == 'POST':
+        dt = datetime.strptime(request.form['release_date'], '%Y-%m-%d')
+        #ADDING CHAPTER
+        chapter = Chapter(
+            title = request.form['title'],
+            manga_id = request.form['manga'],
+            number = request.form['number'],
+            release_date = dt,
+        )
+
+        
+        db.session.add(chapter)
+
+        db.session.flush() #cheat to get the Id after insert, 
+        chapterId = chapter.id
+
+        db.session.commit()
+        #ADDING CHAPTER
+
+        #ADDING PAGES TO CHAPTER
+        count = 0
+        uploaded_files = request.files.getlist("page[]")
+        manga = Manga.query.filter_by(id=request.form['manga']).first()        
+
+        for file in uploaded_files:
+            count += 1
+            
+            filename = file.filename     
+            
+            #Each manga needs a folder, then each chapter needs one, then we insert the pages in
+            mangaTitle = manga.title.replace(" ", "-")
+
+            target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')        
+
+            target = os.path.join(target, mangaTitle)     
+
+            if not os.path.isdir(target):
+                os.mkdir(target)   
+
+            target = os.path.join(target, 'chapter-' + request.form['number'])   
+
+            if not os.path.isdir(target):
+                os.mkdir(target)       
+
+            title = 'page'+str(count)
+            ext = os.path.splitext(filename)[1]
+            destination = "/".join([target, title+ext])
+            file.save(destination)
+
+            page = Page(
+                chapter_id = chapterId,
+                page_number = count,
+                image = 'mangas/' + mangaTitle + '/chapter-' + request.form['number'] + "/" + title + ext
+            )
+
+            db.session.add(page)
+            db.session.commit()            
+       
+
+        flash('Chapter Registered!')
+        return redirect(url_for('manga.read', id=manga.id))        
+
+        #ADDING PAGES TO CHAPTER
 
     return render_template('/manga/chapter/new.html')
 
@@ -153,7 +229,16 @@ def rate():
         rate = Rate.query.filter(Rate.user_id==userId, Rate.manga_id==mangaId).first()         
         rate.value = value
         db.session.commit()
-        return jsonify(result="editou de boas")
+        return jsonify(result="edited")
     
     user.rate(mangaId, value)
-    return jsonify(result="salvou de boas")
+    return jsonify(result="saved")
+
+@manga.route('/pages')
+def getPages():
+    chapterId = request.args.get('id', 0, type=int)
+    chapter = Chapter.query.filter_by(id=chapterId).first()
+
+    pages = Page.query.filter_by(chapter_id=chapterId)
+    return jsonify(pages=[i.serialize for i in pages])
+

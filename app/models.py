@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from . import login_manager
 from datetime import datetime
+from flask import url_for
 
 
 class Role(db.Model):
@@ -115,6 +116,7 @@ class Manga(db.Model):
            # This is an example how to deal with Many2Many relations
         #    'many2many'  : self.serialize_many2many
        }
+
     @property
     def serialize_many2many(self):
        """
@@ -135,6 +137,17 @@ class Chapter(db.Model):
     def __repr__(self):
         return '<Chapter %r>' % self.number     
 
+    @property
+    def serialize(self):
+       """Return object data in easily serializable format"""
+       return {
+           'id'         : self.id,
+           'title'      : self.title,
+           'number'     : self.number,
+           'release_date': dump_datetime(self.release_date),
+       }        
+
+
 class Page(db.Model):
     __tablename__ = 'pages'
     id = db.Column(db.Integer, primary_key=True)
@@ -142,3 +155,13 @@ class Page(db.Model):
     page_number = db.Column(db.Integer)
     image = db.Column(db.String(128))
 
+    @property
+    def serialize(self):
+       """Return object data in easily serializable format"""
+       return {
+           'id'             : self.id,
+           'page_number'    : self.page_number,    
+           'image'          : url_for('static', filename=self.image),
+           # This is an example how to deal with Many2Many relations
+        #    'many2many'  : self.serialize_many2many
+       }

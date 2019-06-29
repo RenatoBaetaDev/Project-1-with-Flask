@@ -57,7 +57,7 @@ class User(UserMixin, db.Model):
 
     def rate(self, manga, value):
         if not self.alreadyRated(manga):
-            rate = Rate(user_id=self, manga_id=manga, value=value)            
+            rate = Rate(user_id=self.id, manga_id=manga, value=value)            
             db.session.add(rate)
             db.session.commit()
 

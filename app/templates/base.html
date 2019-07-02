@@ -44,11 +44,6 @@
                         </a>
                     </li>                
                     <li class="nav-item">                    
-                        <a class="nav-link" href="{{ url_for('manga.register') }}">
-                            Mangas Register
-                        </a>
-                    </li>
-                    <li class="nav-item">                    
                         <a class="nav-link" href="{{ url_for("auth.logout") }}">
                             Log out
                         </a>
@@ -71,12 +66,14 @@
 
 {% block content %}
     <div id="body" class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            {{ message }}
+        </div>
+        {% endfor %}          
+
         {% block page_content %}
-            {% for message in get_flashed_messages() %}
-            <div class="alert alert-warning">
-                {{ message }}
-            </div>
-            {% endfor %}        
+      
         {% endblock %}
     </div>
 

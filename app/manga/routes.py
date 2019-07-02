@@ -7,6 +7,7 @@ from app.models import Manga, Chapter, Page, Rate, User
 from werkzeug.utils import secure_filename
 from app import db
 from datetime import datetime
+import pathlib
 
 @manga.route('/mangas/list')
 def list():
@@ -24,20 +25,27 @@ def register():
         file = request.files['image']
         filename = file.filename     
         
-        target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')        
+        target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')   
+
+        mangaTitle = form.title.data.replace(" ", "-")
+
+        target = os.path.join(target, mangaTitle)     
+           
         if not os.path.isdir(target):
             os.mkdir(target)       
 
-        title = form.title.data
+        title = mangaTitle
         ext = os.path.splitext(filename)[1]
-        destination = "/".join([target, title+ext])
+        if ext is None:
+            ext = 'jpeg'
+        destination = "/".join([target, 'thumb-'+title+ext])
         file.save(destination)
 
         manga = Manga(
-            title=title,
+            title=form.title.data,
             synopsis=form.synopsis.data,
             release_date=form.release_date.data,
-            image="mangas/"+title+ext
+            image="mangas/"+mangaTitle+"/thumb-"+title+ext
         )
         db.session.add(manga)
         db.session.commit()
@@ -53,37 +61,68 @@ def edit(id):
     form = MangaEditForm()
     if form.validate_on_submit():
 
+        if manga.title != form.title.data:
+
+            #Rename the thumb
+
+            destination = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')
+            mangaTitle = form.title.data.replace(" ", "-")
+
+            source = manga.image
+
+            atual = manga.title.replace(" ", "-")
+
+            destination = os.path.join(destination, atual)
+            title = mangaTitle
+            ext = os.path.splitext(source)[1]                
+            destination = "/".join([destination, 'thumb-'+title+ext])
+            print('source: '+os.path.join(app.config['UPLOAD_FOLDER'], source))
+            print('destination: '+destination)
+            os.rename(
+                os.path.join(app.config['UPLOAD_FOLDER'], source),
+                destination 
+            )
+
+            #Rename the folder
+            destination = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')
+            folderTitle = manga.title.replace(" ", "-")
+
+            print('filePre: '+os.path.join(destination, folderTitle))
+            print('filePos: '+os.path.join(destination, mangaTitle))
+
+            os.rename(
+                os.path.join(destination, folderTitle),
+                os.path.join(destination, mangaTitle)
+            )                
+
+            manga.image = "mangas/"+mangaTitle+"/thumb-"+title+ext           
+
         file = request.files['image']
         filename = file.filename    
 
         if file:
+            mangaTitle = form.title.data.replace(" ", "-")
+
             path = os.path.join(app.config['UPLOAD_FOLDER'], manga.image)
             if (os.path.isfile(path)):
                 os.remove(path)   
 
-            target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')        
+            target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')  
+            atual = manga.title.replace(" ", "-")
+            target = os.path.join(target, atual)   
 
             if not os.path.isdir(target):
                 os.mkdir(target)       
 
-            title = form.title.data
-            ext = os.path.splitext(filename)[1]
-            destination = "/".join([target, title+ext])
+            title = mangaTitle
+            ext = pathlib.Path(filename).suffix
+            if ext is None:
+                ext = 'jpeg'
+            destination = "/".join([target, 'thumb-'+title+ext])
             file.save(destination)
 
-            manga.image = "mangas/"+title+ext 
-        else:
-            if manga.title != form.title.data:
-                target = os.path.join(app.config['UPLOAD_FOLDER'], 'mangas')    
-                title = form.title.data
-                ext = os.path.splitext(filename)[1]               
-                destination = "/".join([target, title+ext])     
-                os.rename(
-                    os.path.join(app.config['UPLOAD_FOLDER'], manga.image),
-                    os.path.join(app.config['UPLOAD_FOLDER'], destination)      
-                )
-                manga.image = "mangas/"+title+ext 
-            
+            manga.image = "mangas/"+mangaTitle+"/thumb-"+title+ext            
+                     
 
         manga.title = form.title.data
         manga.synopsis = form.synopsis.data
@@ -111,6 +150,26 @@ def delete(id):
     path = os.path.join(app.config['UPLOAD_FOLDER'], manga.image )
     if (os.path.isfile(path)):
         os.remove(path)    
+
+    chapters = Chapter.query.filter_by(manga_id=id)    
+    for chapter in chapters:
+        pages = Page.query.filter_by(chapter_id=chapter.id)
+        if pages:
+            for page in pages:
+                path = os.path.join(app.config['UPLOAD_FOLDER'], page.image )
+                if (os.path.isfile(path)):
+                    os.remove(path)
+                db.session.delete(page)
+                db.session.commit()
+
+        db.session.delete(chapter)
+        db.session.commit()      
+
+    rates = Rate.query.filter_by(manga_id=id)  
+    for rate in rates:
+        db.session.delete(rate)
+        db.session.commit
+
     db.session.delete(manga)
     db.session.commit()
     return redirect(url_for('manga.list'))
@@ -242,3 +301,11 @@ def getPages():
     pages = Page.query.filter_by(chapter_id=chapterId)
     return jsonify(pages=[i.serialize for i in pages])
 
+# @manga.route('/eraseDataBase')
+# def eraseDataBase():
+#     db.session.query(Chapter).delete()
+#     db.session.query(Manga).delete()
+#     db.session.query(Page).delete()
+#     db.session.query(Rate).delete()
+#     db.session.query(User).delete()
+#     db.session.commit()    
